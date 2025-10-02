@@ -3,9 +3,29 @@
 import { words } from "./words.js";
 let data = words;
 // Pick today's word by day index
-//let todayIndex = Math.floor(Date.now() / (1000*60*60*24)) % data.length;
-let todayIndex = 425; // For testing, set a fixed index.
+// Launch date: 1st November 2025 (midnight UTC)
+// Launch date: 1st November 2025 (midnight UTC)
+const launchDate = new Date("2025-11-01T00:00:00Z");
+
+// Today (UTC at midnight)
+const today = new Date();
+const todayUTC = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+
+const dayIndex = Math.floor((todayUTC - launchDate.getTime()) / (1000 * 60 * 60 * 24));
+
+if (dayIndex < 0) {
+  // Not started yet
+  document.body.innerHTML = `
+    <h1>Disnerdle</h1>
+    <p>The game begins on <strong>1st November 2025</strong>.</p>
+  `;
+  throw new Error("Game not started yet");
+}
+
+// Safe to proceed
+let todayIndex = dayIndex % data.length;
 let current = data[todayIndex];
+
 let maxAttempts = 8;
 let attempts = 0;
 let gameOver = false; 
@@ -23,7 +43,8 @@ for (let i=1; i<=8; i++) {
   if (!(i in stats.distribution)) stats.distribution[i] = 0;
 }
 
-let gameNumber = todayIndex + 1;
+const gameNumber = dayIndex + 1; // Word 1 = 1st Nov 2025
+
 let progressKey = "progress_" + gameNumber;
 
 function saveProgress() {
@@ -305,6 +326,7 @@ function winGame() {
   victory = true;
   saveStats();
   saveProgress();  
+  updateStatsDisplay();
   showPopup(true);
 }
 
@@ -314,6 +336,7 @@ function loseGame() {
   stats.streak = 0;
   saveStats();
   saveProgress();  
+  updateStatsDisplay();
   showPopup(false);
 }
 
@@ -322,7 +345,8 @@ function loseGame() {
 function shareResult() {
   const gameNumber = todayIndex + 1;
   const outcome = victory ? attempts : "X";
-  const header = `Disnerdle ${gameNumber} ${outcome}/${maxAttempts}`;
+  let header = `Disnerdle ${dayIndex + 1} ${outcome}/${maxAttempts}`;
+
   const grid = resultsGrid.join("\n");
   const text = `${header}\n\n${grid}`;
 
@@ -410,13 +434,26 @@ function closePopup() {
   document.getElementById("popup").style.display = "none";
 }
 
+function updateStatsDisplay() {
+  
+  let winRate = stats.played > 0 ? Math.round(stats.wins / stats.played * 100) : 0;
+  // --- NEW: update top line stats ---
+  document.getElementById("gameNum").textContent = dayIndex + 1;
+  document.getElementById("maxGames").textContent = data.length;
+  document.getElementById("curStreak").textContent = stats.streak;
+  document.getElementById("bestStreakTop").textContent = stats.bestStreak;
+
+  document.getElementById("playedTop").textContent = stats.played;
+  document.getElementById("winsTop").textContent = stats.wins;
+  document.getElementById("winRateTop").textContent = winRate;
+}
+
 document.getElementById("closeBtn").addEventListener("click", closePopup);
 document.getElementById("shareBtn").addEventListener("click", shareResult);
-
 
 // ---- INIT ----
 renderBoard();
 renderKeyboard();
 loadProgress()
 loadProgress(); // reapply saved guesses
-
+updateStatsDisplay();

@@ -50,6 +50,17 @@ h1 {
   text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
 }
 
+#topStats {
+  margin: 10px auto 20px auto;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+#topStats div {
+  margin: 4px 0;
+}
+
+
 /* Keep board, keyboard, popup readable */
 #board, #keyboard, #popupContent {
   background: rgba(255, 255, 255, 0.95);

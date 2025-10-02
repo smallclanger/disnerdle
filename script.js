@@ -4,7 +4,7 @@ import { words } from "./words.js";
 let data = words;
 // Pick today's word by day index
 //let todayIndex = Math.floor(Date.now() / (1000*60*60*24)) % data.length;
-let todayIndex = 290; // For testing, set a fixed index.
+let todayIndex = 425; // For testing, set a fixed index.
 let current = data[todayIndex];
 let maxAttempts = 8;
 let attempts = 0;

@@ -88,13 +88,15 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px auto;
-  padding: 15px;
-  background: rgba(255,255,255,0.85); /* semi-transparent */
+  margin: 10px auto;
+  padding: 10px;
+  background: rgba(255,255,255,0.85);
   border-radius: 12px;
-  max-width: 600px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  width: 100%;          /* take all available space */
+  max-width: 100%;      /* remove restriction */
+  box-sizing: border-box;
 }
+
 
 .tile {
   width: 45px;
@@ -136,22 +138,28 @@ h1 {
 }
 
 .key {
-  width: 40px;
+  flex: 1;                  /* keys expand evenly */
+  margin: 2px;
   height: 50px;
-  margin: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e0e0;             /* lighter grey background */
-  border: 1px solid #bbb;          /* subtle border */
+  background: #e0e0e0;
+  border: 1px solid #bbb;
   border-radius: 6px;
-  font-size: 18px;
+  font-size: 4vw;           /* responsive font size */
   font-weight: bold;
   cursor: pointer;
   user-select: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* shadow for contrast */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   transition: background 0.2s, transform 0.1s;
 }
+
+/* Wide keys (ENTER, DEL) should take 1.5x space */
+.key.wide {
+  flex: 1.5;
+}
+
 
 .key:hover {
   background: #d5d5d5;
@@ -177,9 +185,6 @@ h1 {
   color: white;
   border-color: #787c7e;
 }
-.key.wide {
-  width: 80px;
-}
 
 .row {
   display: flex;
@@ -188,9 +193,11 @@ h1 {
 
 .kb-row {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* keys fill row evenly */
+  width: 100%;                    /* take full width of container */
   margin-bottom: 5px;
 }
+
 
 /* Popup modal */
 #popup {
@@ -291,6 +298,15 @@ h1 {
 .tile.flip {
   animation: flip 0.6s ease forwards;
 }
+
+/* Special characters / fixed tiles (spaces, apostrophes etc.) */
+.tile.fixed {
+  background: rgba(200,200,200,0.4);  /* lighter, more transparent */
+  border: 1px dashed #aaa;            /* dashed border to differentiate */
+  color: #444;                        /* darker grey text */
+  font-style: italic;                 /* italics for contrast */
+}
+
 
 @keyframes flip {
   0%   { transform: rotateX(0); }

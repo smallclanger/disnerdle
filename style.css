@@ -45,7 +45,7 @@ body::before {
 
 h1 {
   font-family: 'Disney', cursive;
-  font-size: 48px;
+  font-size: 64px;
   color: #ffca28; /* golden */
   text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
 }

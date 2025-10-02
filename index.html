@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wordle-like Alphanumeric Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Disnerdle</h1>
+<div id="board"></div>
+<div id="keyboard"></div>
+
+<p id="status"></p>
+<p id="hint"></p>
+
+<div id="popup">
+  <div id="popupContent">
+    <h2 id="popupTitle"></h2>
+    <p id="popupAnswer"></p>
+    <p id="popupHint"></p>
+
+<h3>Statistics</h3>
+<div id="popupStats">
+  <div class="stat">
+    <div class="stat-heading">Played</div>
+    <div id="statPlayed" class="stat-value"></div>
+  </div>
+  <div class="stat">
+    <div class="stat-heading">Win %</div>
+    <div id="statWinRate" class="stat-value"></div>
+  </div>
+  <div class="stat">
+    <div class="stat-heading">Current Streak</div>
+    <div id="statStreak" class="stat-value"></div>
+  </div>
+  <div class="stat">
+    <div class="stat-heading">Max Streak</div>
+    <div id="statBest" class="stat-value"></div>
+  </div>
+</div>
+
+
+
+    <h3>Guess Distribution</h3>
+    <div id="distribution"></div>
+
+<button id="closeBtn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M18 6L6 18M6 6l12 12"/>
+  </svg>
+  Close
+</button>
+
+<button id="shareBtn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M4 12v7a2 2 0 0 0 2 2h12a2 
+             2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/>
+  </svg>
+  Share
+</button>
+  </div>
+</div>
+
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+
+/* Page background */
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  min-height: 100vh;
+
+  /* Night-sky gradient */
+  background: linear-gradient(180deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+  color: #fff;
+}
+
+/* Star layer sits above the gradient, below content */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+
+  /* Sparkles (multiple tiny radial gradients) */
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1.5px 1.5px at 70% 40%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2.5px 2.5px at 40% 80%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1px 1px at 80% 20%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 60% 70%, rgba(255,255,255,0.85), transparent);
+
+  background-repeat: repeat;
+  opacity: 0.5;
+
+  /* gentle twinkle */
+  animation: twinkle 7s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0%   { opacity: 0.35; filter: brightness(0.9); }
+  100% { opacity: 0.8;  filter: brightness(1.1); }
+}
+
+
+h1 {
+  font-family: 'Disney', cursive;
+  font-size: 48px;
+  color: #ffca28; /* golden */
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+
+/* Keep board, keyboard, popup readable */
+#board, #keyboard, #popupContent {
+  background: rgba(255, 255, 255, 0.95);
+  color: #000;
+  border-radius: 12px;
+  padding: 15px;
+  margin: auto;
+}
+
+/* Popup stays styled like a card */
+#popupContent {
+  background: rgba(255, 255, 255, 0.95);
+  color: #000;
+  border-radius: 12px;
+  padding: 20px;
+  margin: auto;
+  max-width: 400px;
+}
+
+/* Board container */
+/* Board container */
+#board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  padding: 15px;
+  background: rgba(255,255,255,0.85); /* semi-transparent */
+  border-radius: 12px;
+  max-width: fit-content; /* hugs the rows */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+/* Keyboard container */
+#keyboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  padding: 15px;
+  background: rgba(255,255,255,0.85); /* semi-transparent */
+  border-radius: 12px;
+  max-width: 600px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.tile {
+  width: 45px;
+  height: 45px;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 3px;
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+
+  background: rgba(255,255,255,0.9); /* default (empty) */
+  color: #000;
+}
+
+/* Override backgrounds for game states */
+.correct {
+  background: #6aaa64 !important;
+  color: #fff;
+  border-color: #6aaa64;
+}
+.present {
+  background: #c9b458 !important;
+  color: #fff;
+  border-color: #c9b458;
+}
+.absent {
+  background: #787c7e !important;
+  color: #fff;
+  border-color: #787c7e;
+}
+.fixed {
+  background: rgba(255,255,255,0.7);
+  color: #000;
+}
+
+.key {
+  width: 40px;
+  height: 50px;
+  margin: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0e0e0;             /* lighter grey background */
+  border: 1px solid #bbb;          /* subtle border */
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* shadow for contrast */
+  transition: background 0.2s, transform 0.1s;
+}
+
+.key:hover {
+  background: #d5d5d5;
+}
+
+.key:active {
+  transform: scale(0.95);
+}
+
+/* State colours (guesses override base) */
+.key.correct {
+  background: #6aaa64 !important;
+  color: white;
+  border-color: #6aaa64;
+}
+.key.present {
+  background: #c9b458 !important;
+  color: white;
+  border-color: #c9b458;
+}
+.key.absent {
+  background: #787c7e !important;
+  color: white;
+  border-color: #787c7e;
+}
+.key.wide {
+  width: 80px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+}
+
+.kb-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+/* Popup modal */
+#popup {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+#popup.success #popupContent { background: #a5ee9e; color: rgb(0, 0, 0); }
+#popup.fail #popupContent { background: #d9534f; color: white; }
+#popup h2 { margin-top: 0; }
+.dist-bar {
+  background: #888;
+  margin: 2px 0;
+  text-align: left;
+  padding: 2px;
+  border-radius: 4px;
+  color: white;
+}
+.dist-bar.correct {
+  background: #6aaa64;
+}
+
+/* Buttons inside popup */
+#popup button {
+  background: white;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  margin: 8px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* space between icon and text */
+  transition: background 0.2s, color 0.2s;
+}
+
+#popup.success button {
+  background: #4caf50; /* green */
+  color: white;
+}
+#popup.success button:hover {
+  background: #45a047;
+}
+
+#popup.fail button {
+  background: #d9534f; /* red */
+  color: white;
+}
+#popup.fail button:hover {
+  background: #c9302c;
+}
+
+#popup button svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+#popupStats {
+  display: flex;
+  justify-content: space-around;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.stat {
+  flex: 1;
+}
+
+.stat-heading {
+  font-size: 14px;
+  color: #6b1a80; /* or black if background is white */
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+
+#popupStats div {
+  font-weight: bold;
+}
+
+
+/* Flip animation for tiles */
+.tile.flip {
+  animation: flip 0.6s ease forwards;
+}
+
+@keyframes flip {
+  0%   { transform: rotateX(0); }
+  50%  { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+
+#status { margin: 10px; font-weight: bold; }
+#hint { margin-top: 10px; font-style: italic; }
+
+#stats { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }

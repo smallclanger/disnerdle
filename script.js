@@ -14,13 +14,55 @@ const todayUTC = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.get
 const dayIndex = Math.floor((todayUTC - launchDate.getTime()) / (1000 * 60 * 60 * 24));
 
 if (dayIndex < 0) {
-  // Not started yet
-  document.body.innerHTML = `
-    <h1>Disnerdle</h1>
-    <p>The game begins on <strong>1st November 2025</strong>.</p>
-  `;
+  // Not started yet → show countdown
+  const container = document.createElement("div");
+  container.style.textAlign = "center";
+  container.style.marginTop = "50px";
+container.innerHTML = `
+  <h1>Disnerdle</h1>
+  <p>The game begins on <strong>1st November 2025</strong>.</p>
+  <p id="countdown"></p>
+  <div id="progressOuter">
+    <div id="progressInner"></div>
+  </div>
+`;
+
+  document.body.innerHTML = "";
+  document.body.appendChild(container);
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = launchDate.getTime() - now.getTime();
+  if (diff <= 0) {
+    location.reload(); // start the game when countdown expires
+    return;
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const mins = Math.floor((diff / (1000 * 60)) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+
+  document.getElementById("countdown").textContent =
+    `Starts in ${days}d ${hours}h ${mins}m ${secs}s`;
+
+  // Progress bar %
+  const totalTime = launchDate.getTime() - Date.UTC(2025, 10, 1, 0, 0, 0); // start of launch day
+  const elapsed = now.getTime() - Date.UTC(2025, 0, 1, 0, 0, 0); // example baseline
+  const progress = Math.min(
+    100,
+    ((launchDate.getTime() - diff) / launchDate.getTime()) * 100
+  );
+  document.getElementById("progressInner").style.width = progress + "%";
+}
+
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
   throw new Error("Game not started yet");
 }
+
 
 // Safe to proceed
 let todayIndex = dayIndex % data.length;

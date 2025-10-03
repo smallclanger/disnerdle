@@ -476,6 +476,14 @@ function closePopup() {
   document.getElementById("popup").style.display = "none";
 }
 
+function searchAnswer() {
+  const answer = current.answer;
+  const hint = current.hint;
+  const searchQuery = encodeURIComponent(`${answer} ${hint}`);
+  const googleUrl = `https://www.google.com/search?q=${searchQuery}`;
+  window.open(googleUrl, '_blank');
+}
+
 function updateStatsDisplay() {
   
   let winRate = stats.played > 0 ? Math.round(stats.wins / stats.played * 100) : 0;
@@ -492,6 +500,7 @@ function updateStatsDisplay() {
 
 document.getElementById("closeBtn").addEventListener("click", closePopup);
 document.getElementById("shareBtn").addEventListener("click", shareResult);
+document.getElementById("whatBtn").addEventListener("click", searchAnswer);
 
 // ---- INIT ----
 renderBoard();

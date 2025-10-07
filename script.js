@@ -4,7 +4,6 @@ import { words } from "./words.js";
 let data = words;
 // Pick today's word by day index
 // Launch date: 1st November 2025 (midnight UTC)
-// Launch date: 1st November 2025 (midnight UTC)
 const launchDate = new Date("2025-11-01T00:00:00Z");
 
 // Today (UTC at midnight)
@@ -500,7 +499,7 @@ function updateStatsDisplay() {
 
 document.getElementById("closeBtn").addEventListener("click", closePopup);
 document.getElementById("shareBtn").addEventListener("click", shareResult);
-document.getElementById("whatBtn").addEventListener("click", searchAnswer);
+
 
 // ---- INIT ----
 renderBoard();

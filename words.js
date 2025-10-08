@@ -504,7 +504,9 @@ export const words = [
 { answer: "Presto", hint: "2008" },
 
 { answer: "Clock Cleaners", hint: "1937" },
-
+{ answer: "The Nightmare Before Christmas", hint: "1993" },
+{ answer: "Oogie Boogie", hint:"The Nightmare Before Christmas" },
+{ answer: "Dr. Finkelstein", hint:"The Nightmare Before Christmas" },
 
 { answer: "The Blue Umbrella", hint: "2013" },
 
@@ -562,7 +564,7 @@ export const words = [
 { answer: "The Little Mermaid: Ariel's Beginning", hint: "2008" },
 { answer: "Atlantis: Milo's Return", hint: "2003" },
 { answer: "Tarzan & Jane", hint: "2002" },
-{ answer: "Pooh's Grand Adventure: The Search for Christopher Robin", hint: "1997" },
+{ answer: "Pooh's Grand Adventure", hint: " The Search for Christopher Robin - 1997" },
 { answer: "Winnie the Pooh: Springtime with Roo", hint: "2004" },
 { answer: "Pooh's Heffalump Movie", hint: "2005" },
 { answer: "Pooh's Heffalump Halloween Movie", hint: "2005 (video)" },

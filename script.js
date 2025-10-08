@@ -55,13 +55,11 @@ function updateCountdown() {
   document.getElementById("progressInner").style.width = progress + "%";
 }
 
-
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
   throw new Error("Game not started yet");
 }
-
 
 // Safe to proceed
 let todayIndex = dayIndex % data.length;
@@ -96,7 +94,6 @@ function saveProgress() {
     win: gameOver && victory
   }));
 }
-
 
 function loadProgress() {
   const p = localStorage.getItem(progressKey);

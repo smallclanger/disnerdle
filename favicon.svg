@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Mickey's head - main circle -->
+  <circle cx="16" cy="18" r="10" fill="#000000"/>
+  <!-- Left ear -->
+  <circle cx="8" cy="10" r="7" fill="#000000"/>
+  <!-- Right ear -->
+  <circle cx="24" cy="10" r="7" fill="#000000"/>
+</svg>

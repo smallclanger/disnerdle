@@ -21,9 +21,6 @@ container.innerHTML = `
   <h1>Disnerdle</h1>
   <p>The game begins on <strong>1st November 2025</strong>.</p>
   <p id="countdown"></p>
-  <div id="progressOuter">
-    <div id="progressInner"></div>
-  </div>
 `;
 
   document.body.innerHTML = "";
@@ -32,6 +29,7 @@ container.innerHTML = `
 function updateCountdown() {
   const now = new Date();
   const diff = launchDate.getTime() - now.getTime();
+  
   if (diff <= 0) {
     location.reload(); // start the game when countdown expires
     return;
@@ -42,23 +40,18 @@ function updateCountdown() {
   const mins = Math.floor((diff / (1000 * 60)) % 60);
   const secs = Math.floor((diff / 1000) % 60);
 
-  document.getElementById("countdown").textContent =
-    `Starts in ${days}d ${hours}h ${mins}m ${secs}s`;
-
-  // Progress bar %
-  const totalTime = launchDate.getTime() - Date.UTC(2025, 10, 1, 0, 0, 0); // start of launch day
-  const elapsed = now.getTime() - Date.UTC(2025, 0, 1, 0, 0, 0); // example baseline
-  const progress = Math.min(
-    100,
-    ((launchDate.getTime() - diff) / launchDate.getTime()) * 100
-  );
-  document.getElementById("progressInner").style.width = progress + "%";
+  const countdownElement = document.getElementById("countdown");
+  countdownElement.innerHTML = `
+    <div style="font-size: 120px; font-weight: bold; color: #ffca28; text-shadow: 3px 3px 8px rgba(0,0,0,0.7); margin: 20px 0;">${days}</div>
+    <div style="font-size: 32px; margin-bottom: 10px;">DAYS</div>
+    <div style="font-size: 24px;">${hours}h ${mins}m ${secs}s</div>
+  `;
 }
 
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-  throw new Error("Game not started yet");
+  throw new Error("Game not started yet"); 
 }
 
 // Safe to proceed

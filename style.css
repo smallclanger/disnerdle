@@ -37,26 +37,23 @@ body::before {
   animation: twinkle 7s ease-in-out infinite alternate;
 }
 
+@media (max-width: 480px) {
+  #popupAnswer {
+    font-size: 14px;
+    line-height: 1.3;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  #popupContent {
+    max-width: 90vw;
+    padding: 15px;
+  }
+}
+
 @keyframes twinkle {
   0%   { opacity: 0.35; filter: brightness(0.9); }
   100% { opacity: 0.8;  filter: brightness(1.1); }
-}
-
-#progressOuter {
-  width: 80%;
-  height: 20px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 10px;
-  margin: 10px auto;
-  overflow: hidden;
-}
-
-#progressInner {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, #42a5f5, #1e88e5);
-  border-radius: 10px;
-  transition: width 1s linear;
 }
 
 h1 {
@@ -101,13 +98,37 @@ h1 {
 #board {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   margin: 20px auto;
   padding: 15px;
   background: rgba(255,255,255,0.85); /* semi-transparent */
   border-radius: 12px;
-  max-width: fit-content; /* hugs the rows */
+  max-width: 90vw; /* responsive width */
+  width: fit-content;
+  min-width: 300px; /* minimum width */
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.3) transparent;
+}
+
+/* Custom scrollbar for board container (webkit browsers) */
+#board::-webkit-scrollbar {
+  height: 8px;
+}
+
+#board::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+
+#board::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
+}
+
+#board::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.5);
 }
 
 /* Keyboard container */
@@ -138,6 +159,7 @@ h1 {
   text-transform: uppercase;
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  flex-shrink: 0; /* prevent tiles from shrinking */
 
   background: rgba(255,255,255,0.9); /* default (empty) */
   color: #000;
@@ -214,7 +236,9 @@ h1 {
 
 .row {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  padding: 5px 0;
+  width: fit-content;
 }
 
 .kb-row {
@@ -344,3 +368,22 @@ h1 {
 #hint { margin-top: 10px; font-style: italic; }
 
 #stats { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
+
+/* Mobile responsive improvements for horizontal scrolling */
+@media (max-width: 480px) {
+  #board {
+    max-width: 95vw;
+    padding: 10px;
+  }
+  
+  .tile {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    margin: 2px;
+  }
+  
+  .row {
+    padding: 3px 0;
+  }
+}

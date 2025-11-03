@@ -49,6 +49,18 @@ body::before {
     max-width: 90vw;
     padding: 15px;
   }
+
+  /* Mobile keyboard optimizations */
+  .key {
+    height: 55px; /* Slightly taller for easier touch targets */
+    font-size: 18px; /* Fixed size instead of vw for consistency */
+    margin: 1px; /* Tighter margins for more space */
+  }
+
+  /* Faster animations on mobile */
+  .key {
+    transition: transform 0.03s ease-out;
+  }
 }
 
 @keyframes twinkle {
@@ -201,7 +213,12 @@ h1 {
   cursor: pointer;
   user-select: none;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background 0.2s, transform 0.1s;
+  transition: transform 0.05s ease-out; /* Faster, smoother transition */
+  
+  /* Mobile touch optimizations */
+  touch-action: manipulation; /* Prevents double-tap zoom */
+  -webkit-tap-highlight-color: transparent; /* Remove iOS tap highlight */
+  -webkit-touch-callout: none; /* Disable callout */
 }
 
 /* Wide keys (ENTER, DEL) should take 1.5x space */
@@ -209,12 +226,18 @@ h1 {
   flex: 1.5;
 }
 
-.key:hover {
-  background: #d5d5d5;
+/* Hover only on devices that support it (not touch devices) */
+@media (hover: hover) {
+  .key:hover {
+    background: #d5d5d5;
+  }
 }
 
-.key:active {
+/* Active/pressed state for immediate feedback */
+.key:active,
+.key.pressed {
   transform: scale(0.95);
+  background: #d0d0d0;
 }
 
 /* State colours (guesses override base) */

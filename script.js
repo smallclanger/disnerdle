@@ -211,11 +211,41 @@ function renderKeyboard() {
       }
 
       key.textContent = ch;
-      key.onclick = () => {
+      
+      // Optimized event handling for mobile responsiveness
+      const handleKeyPress = () => {
         if (ch === "ENTER") submitGuess();
         else if (ch === "DEL") deleteKey();
         else pressKey(ch);
       };
+
+      // Use touchstart for immediate response on mobile, onclick as fallback
+      key.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent ghost clicks
+        key.classList.add('pressed');
+        handleKeyPress();
+      }, { passive: false });
+
+      key.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        key.classList.remove('pressed');
+      }, { passive: false });
+
+      // Mouse events for desktop
+      key.addEventListener('mousedown', () => {
+        key.classList.add('pressed');
+      });
+
+      key.addEventListener('mouseup', () => {
+        key.classList.remove('pressed');
+      });
+
+      key.addEventListener('mouseleave', () => {
+        key.classList.remove('pressed');
+      });
+
+      // Fallback click handler
+      key.onclick = handleKeyPress;
 
       rowDiv.appendChild(key);
     });
@@ -227,14 +257,19 @@ function renderKeyboard() {
 
 // ---- INPUT ----
 let currentGuess = "";
+let cleanAnswerCache = ""; // Cache to avoid repeated regex operations
+
 function pressKey(ch) {
   if (gameOver) return;
-  let cleanAnswer = current.answer.replace(/[^a-z0-9]/gi,"");
-  if (currentGuess.length < cleanAnswer.length) {
+  if (!cleanAnswerCache) {
+    cleanAnswerCache = current.answer.replace(/[^a-z0-9]/gi,"");
+  }
+  if (currentGuess.length < cleanAnswerCache.length) {
     currentGuess += ch;
     updateBoardTiles();
   }
 }
+
 function deleteKey() {
   if (gameOver) return;
   currentGuess = currentGuess.slice(0, -1);
@@ -242,17 +277,29 @@ function deleteKey() {
 }
 
 function updateBoardTiles() {
-  let row = board.children[currentRow];
-  let cleanAnswer = current.answer.replace(/[^a-z0-9]/gi,"");
+  const row = board.children[currentRow];
+  if (!cleanAnswerCache) {
+    cleanAnswerCache = current.answer.replace(/[^a-z0-9]/gi,"");
+  }
   let idx = 0;
 
-  for (let i=0;i<current.answer.length;i++) {
-    let ch = current.answer[i];
-    if (!/[a-z0-9]/i.test(ch)) continue;
-    let tile = row.children[i];
-    tile.textContent = currentGuess[idx] || "";
-    idx++;
+  // Cache the tiles that need updating to avoid repeated DOM queries
+  const editableTiles = [];
+  for (let i = 0; i < current.answer.length; i++) {
+    const ch = current.answer[i];
+    if (/[a-z0-9]/i.test(ch)) {
+      editableTiles.push({ tile: row.children[i], index: idx });
+      idx++;
+    }
   }
+
+  // Update only the editable tiles in a single loop
+  editableTiles.forEach(({ tile, index }) => {
+    const newContent = currentGuess[index] || "";
+    if (tile.textContent !== newContent) {
+      tile.textContent = newContent;
+    }
+  });
 }
 
 // ---- GUESS ----
@@ -329,6 +376,7 @@ function submitGuess() {
   } else {
     currentRow++;
     currentGuess = "";
+    cleanAnswerCache = ""; // Reset cache for new row
   }
 }
 

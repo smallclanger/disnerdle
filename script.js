@@ -353,14 +353,27 @@ function ensureCurrentTileVisible() {
         const tileRect = currentTile.getBoundingClientRect();
         const boardRect = board.getBoundingClientRect();
         
-        // Check if tile is outside the visible area
+        // Check if tile is outside the visible area (horizontal only)
         if (tileRect.left < boardRect.left + 20 || tileRect.right > boardRect.right - 20) {
-          currentTile.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center'
+          // Manual horizontal scroll to avoid any vertical scrolling
+          const tileOffsetLeft = currentTile.offsetLeft;
+          const boardScrollLeft = board.scrollLeft;
+          const boardWidth = board.clientWidth;
+          
+          // Calculate desired scroll position to center the tile horizontally
+          const desiredScrollLeft = tileOffsetLeft - (boardWidth / 2) + (currentTile.offsetWidth / 2);
+          
+          // Ensure we don't scroll past the boundaries
+          const maxScrollLeft = board.scrollWidth - board.clientWidth;
+          const finalScrollLeft = Math.max(0, Math.min(desiredScrollLeft, maxScrollLeft));
+          
+          // Use smooth horizontal-only scrolling
+          board.scrollTo({
+            left: finalScrollLeft,
+            behavior: 'smooth'
           });
-          console.log(`Scrolled to show tile at position ${currentGuess.length}`);
+          
+          console.log(`Horizontally scrolled to show tile at position ${currentGuess.length}`);
         }
       }
     }

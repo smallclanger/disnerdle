@@ -454,6 +454,5 @@ h1 {
   /* Make the first tile in each row have no left margin */
   .tile:first-child {
     margin-left: 0;
-    border-left: 3px solid #ff4444; /* Red border to easily spot clipping */
   }
 }

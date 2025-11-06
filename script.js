@@ -180,6 +180,20 @@ console.log(current.answer);
     }
     board.appendChild(rowDiv);
   }
+  
+  // Force scroll position to start at left with multiple methods
+  // Use multiple approaches to ensure it works across different devices
+  requestAnimationFrame(() => {
+    ensureBoardScrollLeft();
+    
+    // Additional debugging
+    if (window.innerWidth <= 480) {
+      console.log("Mobile device detected");
+      console.log("Board scroll width:", board.scrollWidth);
+      console.log("Board client width:", board.clientWidth);
+      console.log("Board scroll left:", board.scrollLeft);
+    }
+  });
 }
 
 // ---- KEYBOARD ----
@@ -300,6 +314,57 @@ function updateBoardTiles() {
       tile.textContent = newContent;
     }
   });
+
+  // Ensure current tile is visible on mobile devices
+  ensureCurrentTileVisible();
+}
+
+function ensureCurrentTileVisible() {
+  // Only apply scroll adjustments on mobile devices
+  if (window.innerWidth <= 480) {
+    const row = board.children[currentRow];
+    if (!row) return;
+    
+    // Find the current tile being typed (position of cursor)
+    let currentTileIndex = -1;
+    let idx = 0;
+    for (let i = 0; i < current.answer.length; i++) {
+      const ch = current.answer[i];
+      if (/[a-z0-9]/i.test(ch)) {
+        if (idx === currentGuess.length) {
+          currentTileIndex = i;
+          break;
+        }
+        idx++;
+      }
+    }
+    
+    if (currentTileIndex >= 0) {
+      const currentTile = row.children[currentTileIndex];
+      if (currentTile) {
+        // If we're at the beginning, ensure we scroll to the left
+        if (currentGuess.length === 0) {
+          board.scrollLeft = 0;
+          console.log("Reset scroll to start of word");
+          return;
+        }
+        
+        // Scroll to ensure the current tile is visible with some padding
+        const tileRect = currentTile.getBoundingClientRect();
+        const boardRect = board.getBoundingClientRect();
+        
+        // Check if tile is outside the visible area
+        if (tileRect.left < boardRect.left + 20 || tileRect.right > boardRect.right - 20) {
+          currentTile.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+          });
+          console.log(`Scrolled to show tile at position ${currentGuess.length}`);
+        }
+      }
+    }
+  }
 }
 
 // ---- GUESS ----
@@ -539,9 +604,47 @@ document.getElementById("closeBtn").addEventListener("click", closePopup);
 document.getElementById("shareBtn").addEventListener("click", shareResult);
 
 
+function ensureBoardScrollLeft() {
+  // Force board to scroll to leftmost position
+  // This is specifically to fix mobile clipping issue
+  if (board) {
+    const before = board.scrollLeft;
+    board.scrollLeft = 0;
+    board.scrollTo({ left: 0, behavior: 'auto' });
+    
+    console.log(`Scroll fix: before=${before}, after=${board.scrollLeft}`);
+    console.log(`Board dimensions: scrollWidth=${board.scrollWidth}, clientWidth=${board.clientWidth}`);
+    
+    // Additional check for mobile
+    if (window.innerWidth <= 480) {
+      console.log("Mobile scroll fix applied");
+      // Force immediate scroll reset on mobile
+      setTimeout(() => {
+        board.scrollLeft = 0;
+        console.log(`Mobile timeout fix: scrollLeft now ${board.scrollLeft}`);
+      }, 50);
+      
+      // Also try after any potential layout shifts
+      setTimeout(() => {
+        board.scrollLeft = 0;
+        console.log(`Mobile delayed fix: scrollLeft now ${board.scrollLeft}`);
+      }, 200);
+    }
+  }
+}
+
 // ---- INIT ----
 renderBoard();
 renderKeyboard();
 loadProgress()
 loadProgress(); // reapply saved guesses
 updateStatsDisplay();
+
+// Ensure scroll position is correct after everything loads
+ensureBoardScrollLeft();
+
+// Also fix scroll when window resizes or orientation changes
+window.addEventListener('resize', ensureBoardScrollLeft);
+window.addEventListener('orientationchange', () => {
+  setTimeout(ensureBoardScrollLeft, 100);
+});

@@ -228,6 +228,11 @@ function renderKeyboard() {
       
       // Optimized event handling for mobile responsiveness
       const handleKeyPress = () => {
+        // Initialize audio context on first user interaction
+        if (soundEffects.audioContext && soundEffects.audioContext.state === 'suspended') {
+          soundEffects.audioContext.resume();
+        }
+        
         if (ch === "ENTER") submitGuess();
         else if (ch === "DEL") deleteKey();
         else pressKey(ch);
@@ -484,6 +489,11 @@ function winGame() {
   saveStats();
   saveProgress();  
   updateStatsDisplay();
+  
+  // Trigger fireworks animation and celebration sound
+  createFireworks();
+  soundEffects.playWinSound();
+  
   showPopup(true);
 }
 
@@ -494,6 +504,10 @@ function loseGame() {
   saveStats();
   saveProgress();  
   updateStatsDisplay();
+  
+  // Play sad trumpet sound
+  soundEffects.playLoseSound();
+  
   showPopup(false);
 }
 
@@ -615,6 +629,21 @@ function updateStatsDisplay() {
 
 document.getElementById("closeBtn").addEventListener("click", closePopup);
 document.getElementById("shareBtn").addEventListener("click", shareResult);
+document.getElementById("soundBtn").addEventListener("click", toggleSound);
+
+function toggleSound() {
+  const isEnabled = soundEffects.toggle();
+  const soundText = document.getElementById("soundText");
+  const soundIcon = document.getElementById("soundIcon");
+  
+  if (isEnabled) {
+    soundText.textContent = "Sound On";
+    soundIcon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07l-.7-.7A4 4 0 0 0 16 12a4 4 0 0 0-1.16-2.83l.7-.7z"/>';
+  } else {
+    soundText.textContent = "Sound Off";
+    soundIcon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M23 9l-6 6M17 9l6 6"/>';
+  }
+}
 
 
 function ensureBoardScrollLeft() {
@@ -646,7 +675,223 @@ function ensureBoardScrollLeft() {
   }
 }
 
-// ---- INIT ----
+// ---- SOUND EFFECTS ----
+class SoundEffects {
+  constructor() {
+    this.audioContext = null;
+    this.enabled = true;
+    this.initAudioContext();
+  }
+
+  initAudioContext() {
+    try {
+      // Create audio context on user interaction to comply with autoplay policies
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      console.warn('Web Audio API not supported');
+      this.enabled = false;
+    }
+  }
+
+  async ensureAudioContext() {
+    if (!this.audioContext || !this.enabled) return false;
+    
+    if (this.audioContext.state === 'suspended') {
+      try {
+        await this.audioContext.resume();
+      } catch (e) {
+        console.warn('Could not resume audio context');
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Generate celebration sound (ascending chimes)
+  async playWinSound() {
+    if (!(await this.ensureAudioContext())) return;
+
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    const duration = 0.3;
+    
+    notes.forEach((frequency, index) => {
+      setTimeout(() => {
+        this.playTone(frequency, duration, 'triangle', 0.1);
+      }, index * 200);
+    });
+    
+    // Add some sparkle with higher pitched bells
+    setTimeout(() => {
+      this.playTone(1567.98, 0.5, 'sine', 0.05); // G6
+    }, 600);
+    setTimeout(() => {
+      this.playTone(2093.00, 0.5, 'sine', 0.05); // C7
+    }, 800);
+  }
+
+  // Generate sad trumpet sound (descending "wah wah wah")
+  async playLoseSound() {
+    if (!(await this.ensureAudioContext())) return;
+
+    // Sad trumpet descending notes
+    const notes = [440, 392, 349, 311]; // A4, G4, F4, D#4
+    const duration = 0.6;
+    
+    notes.forEach((frequency, index) => {
+      setTimeout(() => {
+        // Use sawtooth wave for trumpet-like sound with vibrato
+        this.playTrumpetNote(frequency, duration, 0.15);
+      }, index * 400);
+    });
+  }
+
+  playTone(frequency, duration, waveType = 'sine', volume = 0.1) {
+    if (!this.audioContext) return;
+
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+    oscillator.type = waveType;
+    
+    // Envelope for natural sound
+    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+    
+    oscillator.start(this.audioContext.currentTime);
+    oscillator.stop(this.audioContext.currentTime + duration);
+  }
+
+  playTrumpetNote(frequency, duration, volume = 0.1) {
+    if (!this.audioContext) return;
+
+    const oscillator = this.audioContext.createOscillator();
+    const vibratoOsc = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    const vibratoGain = this.audioContext.createGain();
+    
+    // Main trumpet sound (sawtooth for brass-like timbre)
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+    
+    // Vibrato effect
+    vibratoOsc.type = 'sine';
+    vibratoOsc.frequency.setValueAtTime(5, this.audioContext.currentTime); // 5Hz vibrato
+    vibratoGain.gain.setValueAtTime(10, this.audioContext.currentTime); // Vibrato depth
+    
+    // Connect vibrato to main oscillator frequency
+    vibratoOsc.connect(vibratoGain);
+    vibratoGain.connect(oscillator.frequency);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    
+    // Envelope for trumpet-like attack and decay
+    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.05);
+    gainNode.gain.linearRampToValueAtTime(volume * 0.7, this.audioContext.currentTime + duration * 0.3);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+    
+    vibratoOsc.start(this.audioContext.currentTime);
+    oscillator.start(this.audioContext.currentTime);
+    
+    vibratoOsc.stop(this.audioContext.currentTime + duration);
+    oscillator.stop(this.audioContext.currentTime + duration);
+  }
+
+  // Enable/disable sounds (for user preference)
+  toggle() {
+    this.enabled = !this.enabled;
+    return this.enabled;
+  }
+}
+
+// Initialize sound effects
+const soundEffects = new SoundEffects();
+
+// ---- FIREWORKS ANIMATION ---- 
+function createFireworks() {
+  // Create fireworks container
+  const fireworksContainer = document.createElement('div');
+  fireworksContainer.className = 'fireworks-container';
+  document.body.appendChild(fireworksContainer);
+
+  // Create streamers container
+  const streamersContainer = document.createElement('div');
+  streamersContainer.className = 'streamers-container';
+  document.body.appendChild(streamersContainer);
+
+  // Colors for fireworks
+  const colors = ['gold', 'blue', 'red', 'green', 'purple'];
+  
+  // Create multiple firework bursts
+  for (let burst = 0; burst < 6; burst++) {
+    setTimeout(() => {
+      const centerX = Math.random() * window.innerWidth;
+      const centerY = Math.random() * (window.innerHeight * 0.6) + 50;
+      
+      // Create firework particles for this burst
+      for (let i = 0; i < 20; i++) {
+        const firework = document.createElement('div');
+        firework.className = `firework ${colors[Math.floor(Math.random() * colors.length)]}`;
+        
+        // Random direction and distance
+        const angle = (Math.PI * 2 * i) / 20;
+        const distance = 50 + Math.random() * 100;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+        
+        firework.style.left = centerX + 'px';
+        firework.style.top = centerY + 'px';
+        firework.style.setProperty('--dx', dx + 'px');
+        firework.style.setProperty('--dy', dy + 'px');
+        
+        fireworksContainer.appendChild(firework);
+        
+        // Remove the firework after animation
+        setTimeout(() => {
+          if (firework.parentNode) {
+            firework.parentNode.removeChild(firework);
+          }
+        }, 1500);
+      }
+    }, burst * 300);
+  }
+
+  // Create falling streamers
+  for (let i = 0; i < 15; i++) {
+    setTimeout(() => {
+      const streamer = document.createElement('div');
+      streamer.className = 'streamer';
+      streamer.style.left = Math.random() * window.innerWidth + 'px';
+      streamer.style.animationDelay = Math.random() * 1 + 's';
+      streamersContainer.appendChild(streamer);
+      
+      // Remove streamer after animation
+      setTimeout(() => {
+        if (streamer.parentNode) {
+          streamer.parentNode.removeChild(streamer);
+        }
+      }, 3000);
+    }, i * 100);
+  }
+
+  // Clean up containers after all animations complete
+  setTimeout(() => {
+    if (fireworksContainer.parentNode) {
+      fireworksContainer.parentNode.removeChild(fireworksContainer);
+    }
+    if (streamersContainer.parentNode) {
+      streamersContainer.parentNode.removeChild(streamersContainer);
+    }
+  }, 5000);
+}
+
+// ---- INIT ---- 
 renderBoard();
 renderKeyboard();
 loadProgress()

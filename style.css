@@ -456,3 +456,102 @@ h1 {
     margin-left: 0;
   }
 }
+
+/* ---- FIREWORKS ANIMATION ---- */
+.fireworks-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.firework {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: firework 1.5s ease-out forwards;
+}
+
+.firework.gold {
+  background: radial-gradient(circle, #ffd700, #ffed4e);
+  box-shadow: 0 0 6px #ffd700, 0 0 12px #ffd700;
+}
+
+.firework.blue {
+  background: radial-gradient(circle, #4fc3f7, #29b6f6);
+  box-shadow: 0 0 6px #4fc3f7, 0 0 12px #4fc3f7;
+}
+
+.firework.red {
+  background: radial-gradient(circle, #f44336, #e53935);
+  box-shadow: 0 0 6px #f44336, 0 0 12px #f44336;
+}
+
+.firework.green {
+  background: radial-gradient(circle, #4caf50, #43a047);
+  box-shadow: 0 0 6px #4caf50, 0 0 12px #4caf50;
+}
+
+.firework.purple {
+  background: radial-gradient(circle, #9c27b0, #8e24aa);
+  box-shadow: 0 0 6px #9c27b0, 0 0 12px #9c27b0;
+}
+
+@keyframes firework {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(var(--dx), var(--dy)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Streamers animation */
+.streamers-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  overflow: hidden;
+}
+
+.streamer {
+  position: absolute;
+  width: 8px;
+  height: 100px;
+  background: linear-gradient(45deg, 
+    #ffd700 0%, 
+    #ff6b6b 25%, 
+    #4ecdc4 50%, 
+    #45b7d1 75%, 
+    #f9ca24 100%
+  );
+  border-radius: 4px;
+  animation: fall 3s linear forwards;
+  opacity: 0.8;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}

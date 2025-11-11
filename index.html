@@ -69,6 +69,13 @@
   Share
 </button>
 
+<button id="soundBtn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="soundIcon">
+    <path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07l-.7-.7A4 4 0 0 0 16 12a4 4 0 0 0-1.16-2.83l.7-.7z"/>
+  </svg>
+  <span id="soundText">Sound On</span>
+</button>
+
 <button id="closeBtn">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M18 6L6 18M6 6l12 12"/>
@@ -78,6 +85,13 @@
   </div>
 </div>
 
+<!-- Audio elements for sound effects -->
+<audio id="winSound" preload="auto">
+  <!-- We'll generate this programmatically with Web Audio API -->
+</audio>
+<audio id="loseSound" preload="auto">
+  <!-- We'll generate this programmatically with Web Audio API -->
+</audio>
 
 <script type="module" src="script.js"></script>
 </body>
